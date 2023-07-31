@@ -1,0 +1,42 @@
+/* styles.css */
+.container {
+    margin-top: 5rem;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .card-text {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .list-group-item {
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  .btn-transparent {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    width: 100%;
+    text-align: left;
+    outline: none;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 5px;
+  }
+  
+  .btn-transparent:hover {
+    background-color: #b5e0ff; 
+  }
+  
+  .btn-transparent.selected {
+    background-color: #007bff; 
+    color: #ffffff; 
+    box-shadow: 0 0 4px #007bff;
+  }
