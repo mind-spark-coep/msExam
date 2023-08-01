@@ -1,19 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Question = require('../models/question');
+const Question = require("../models/question");
 
 // GET all questions
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const questions = await Question.find();
-    res.json(questions);
+    res.status(200).json(questions);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 // POST a new question
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   const question = new Question({
     questionText: req.body.questionText,
     options: req.body.options,
@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT (update) a question
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const updatedQuestion = await Question.findByIdAndUpdate(
       req.params.id,
@@ -47,7 +47,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE a question
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const deletedQuestion = await Question.findByIdAndDelete(req.params.id);
     res.json(deletedQuestion);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userResponseSchema = new mongoose.Schema({
   userId: {
@@ -7,7 +7,7 @@ const userResponseSchema = new mongoose.Schema({
   },
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Question',
+    ref: "Question",
     required: true,
   },
   selectedAnswer: {
@@ -16,6 +16,10 @@ const userResponseSchema = new mongoose.Schema({
   },
 });
 
-const UserResponse = mongoose.model('UserResponse', userResponseSchema);
+const UserResponse = mongoose.model(
+  "UserResponse",
+  userResponseSchema,
+  "ExamPortal"
+);
 
 module.exports = UserResponse;

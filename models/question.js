@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const { model, Schema } = require("mongoose");
 
-const questionSchema = new mongoose.Schema({
+const questionSchema = new Schema({
   questionText: {
     type: String,
     required: true,
@@ -8,9 +8,13 @@ const questionSchema = new mongoose.Schema({
   options: {
     type: [String],
     required: true,
-  }
+  },
+  correctAnswer: {
+    type: Number,
+    required: true,
+  },
 });
 
-const Question = mongoose.model('Question', questionSchema);
+const Question = model("questions", questionSchema, "ExamPortal");
 
 module.exports = Question;
