@@ -4,18 +4,25 @@ const UserResponse = require('../models/userResponse.js');
 const Question = require('../models/question.js');
 
 router.post('/', async (req, res) => {
-  const { userId, responses } = req.body;
+  const { userID, responses, formData, score } = req.body;
 
   try {
     const userResponses = responses.map((response) => ({
-      userId,
       questionId: response.questionId,
       selectedAnswer: response.selectedAnswer,
+      isCorrect: response.isCorrect,
     }));
-    
-    const savedResponses = await UserResponse.insertMany(userResponses);
 
-    res.status(201).json(savedResponses);
+    const newUserResponse = new UserResponse({
+      userID: userID,
+      responses: userResponses,
+      formData: formData,
+      score: score,
+    });
+
+    const savedResponse = await newUserResponse.save();
+
+    res.status(201).json(savedResponse);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

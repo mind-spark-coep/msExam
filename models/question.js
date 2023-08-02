@@ -15,6 +15,6 @@ const questionSchema = new Schema({
   },
 });
 
-const Question = model("questions", questionSchema, "ExamPortal");
+const Question = model("questions", questionSchema);
 
 module.exports = Question;

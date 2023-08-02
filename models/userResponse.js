@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
-const userResponseSchema = new mongoose.Schema({
-  userId: {
-    type: String,
-    required: true,
-  },
+const answerResponseSchema = new mongoose.Schema({
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Question",
@@ -14,12 +10,31 @@ const userResponseSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isCorrect: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const userResponseSchema = new mongoose.Schema({
+  userID: {
+    type: String,
+    required: true,
+  },
+  responses: [answerResponseSchema],
+  formData: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+  score: {
+    type: Number,
+    required: true,
+  },
 });
 
 const UserResponse = mongoose.model(
   "UserResponse",
   userResponseSchema,
-  "ExamPortal"
 );
 
 module.exports = UserResponse;
