@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const Question = require("./models/question.js");
 
 require("dotenv").config();
 
@@ -27,7 +26,7 @@ connection.once("open", async () => {
 // Routes
 const questionsRouter = require("./routes/questions");
 const responsesRouter = require("./routes/responses");
-const usersRouter = require("./routes/users")
+const usersRouter = require("./routes/users");
 
 app.use("/questions", questionsRouter);
 app.use("/responses", responsesRouter);
