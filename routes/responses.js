@@ -4,14 +4,27 @@ const UserResponse = require('../models/userResponse.js');
 const Question = require('../models/question.js');
 
 router.post('/', async (req, res) => {
-  const { userID, responses, formData, score } = req.body;
+  const { userID, responses, formData } = req.body;
 
   try {
-    const userResponses = responses.map((response) => ({
-      questionId: response.questionId,
-      selectedAnswer: response.selectedAnswer,
-      isCorrect: response.isCorrect,
-    }));
+    let score = 0;
+    const questions = await Question.find();
+
+    const userResponses = responses.map((response) => {
+      const question = questions.find((q) => q._id.toString() === response.questionId);
+      const selectedAnswerIndex = question.options.indexOf(response.selectedAnswer);
+      const isCorrect = selectedAnswerIndex === question.correctAnswer;
+
+      if (isCorrect) {
+        score++; 
+      }
+
+      return {
+        questionId: response.questionId,
+        selectedAnswer: response.selectedAnswer,
+        isCorrect,
+      };
+    });
 
     const newUserResponse = new UserResponse({
       userID: userID,

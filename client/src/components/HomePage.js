@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import examPortalImage from '../assets/mindsparkLogo2.png';
 import { RiEyeLine } from 'react-icons/ri';
 import './HomePage.css';
@@ -13,7 +14,8 @@ function HomePage() {
     password: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -24,17 +26,23 @@ function HomePage() {
     }));
   };
 
-  const isUserInfoProvided = () => {
-    const { name, school, standard, email, password } = formData;
-    return name !== '' && school !== '' && standard !== '' && email !== '' && password !== '';
-  };
-
-  const handleStartTest = () => {
-    if (isUserInfoProvided()) {
-      console.log(formData);
-      navigate('/test', { state: formData });
+  const handleStartTest = async () => {
+    if (!formData.name || !formData.school || !formData.standard || !formData.email || !formData.password) {
+      setErrorMessage('Please fill in all the fields before starting the test.');
     } else {
-      alert('Please fill in all the fields before starting the test.');
+      try {
+        const response = await axios.post('http://localhost:5000/users/check', formData);
+        const isRegistered = response.data.isRegistered;
+
+        if (isRegistered) {
+          navigate('/test', { state: formData });
+        } else {
+          setErrorMessage('You are not a registered user. Please register first.');
+        }
+      } catch (error) {
+        console.error('Error checking registered user:', error);
+        setErrorMessage('An error occurred. Please try again later.');
+      }
     }
   };
 
@@ -108,15 +116,10 @@ function HomePage() {
               </span>
             </div>
           </div>
-          {isUserInfoProvided() ? (
-            <button className="btn btn-primary" onClick={handleStartTest}>
-              Start Test
-            </button>
-          ) : (
-            <button className="btn btn-primary" disabled>
-              Start Test
-            </button>
-          )}
+          <button className="btn btn-primary" onClick={handleStartTest}>
+            Start Test
+          </button>
+          {errorMessage && <p className='alert-message'>{errorMessage}</p>}
         </div>
       </div>
     </div>

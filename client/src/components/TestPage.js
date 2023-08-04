@@ -18,8 +18,9 @@ function TestPage() {
       const response = await axios.get('http://localhost:5000/questions');
       console.log("Connection Established");
       setQuestions(response.data);
-      setUserResponses(Array(response.data.length).fill({ questionId: '', selectedAnswer: '', isCorrect: false }));
+      setUserResponses(Array(response.data.length).fill({ questionId: '', selectedAnswer: '' }));
       console.log("All Questions Received");
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
@@ -44,14 +45,9 @@ function TestPage() {
     const updatedResponses = [...userResponses];
     const question = questions[currentQuestionIndex];
 
-    const selectedAnswerIndex = question.options.indexOf(selectedAnswer);
-
-    const isCorrect = selectedAnswerIndex === question.correctAnswer;
-
     updatedResponses[currentQuestionIndex] = {
       questionId: question._id,
       selectedAnswer,
-      isCorrect,
     };
 
     setUserResponses(updatedResponses);
@@ -59,20 +55,22 @@ function TestPage() {
 
   const submitResponses = useCallback(async () => {
     try {
+      const responsesWithoutIsCorrect = userResponses.map((response) => ({
+        questionId: response.questionId,
+        selectedAnswer: response.selectedAnswer,
+      }));
+
       let totalScore = 0;
-      userResponses.forEach((response) => {
-        if (response.isCorrect) {
-          totalScore++;
-        }
-      });
 
       const response = await axios.post('http://localhost:5000/responses', {
         userID: name,
-        responses: userResponses,
+        responses: responsesWithoutIsCorrect,
         score: totalScore,
         formData: location.state,
       });
+
       console.log('Responses submitted Successfully');
+      console.log(response);
       navigate('/result', { state: { score: totalScore } });
     } catch (error) {
       console.error('Error submitting responses:', error);

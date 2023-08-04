@@ -5,7 +5,8 @@ const Question = require("../models/question");
 // GET all questions
 router.get("/", async (req, res) => {
   try {
-    const questions = await Question.find();
+    const questions = await Question.find({}, { correctAnswer: 0 });
+
     res.status(200).json(questions);
   } catch (error) {
     res.status(500).json({ message: error.message });

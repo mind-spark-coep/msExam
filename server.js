@@ -27,9 +27,11 @@ connection.once("open", async () => {
 // Routes
 const questionsRouter = require("./routes/questions");
 const responsesRouter = require("./routes/responses");
+const usersRouter = require("./routes/users")
 
 app.use("/questions", questionsRouter);
 app.use("/responses", responsesRouter);
+app.use("/users", usersRouter);
 
 // Start the server
 app.listen(PORT, () => {
