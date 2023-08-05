@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import examPortalImage from '../assets/mindsparkLogo2.png';
-import { RiEyeLine } from 'react-icons/ri';
-import './HomePage.css';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import examPortalImage from "../assets/mindsparkLogo2.png";
+import { RiEyeLine } from "react-icons/ri";
+import "./HomePage.css";
 
 function HomePage() {
   const [formData, setFormData] = useState({
-    name: '',
-    school: '',
-    standard: '',
-    email: '',
-    password: '',
+    name: "",
+    school: "",
+    standard: "",
+    email: "",
+    password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,23 +25,49 @@ function HomePage() {
       [name]: value,
     }));
   };
+  const localJwt = (j) => {
+    localStorage.setItem("jwt", j);
+  };
 
   const handleStartTest = async () => {
-    if (!formData.name || !formData.school || !formData.standard || !formData.email || !formData.password) {
-      setErrorMessage('Please fill in all the fields before starting the test.');
+    console.log(formData);
+    // console.log(`${process.env.SERVER_URL}users/check`);
+    if (
+      !formData.name ||
+      !formData.school ||
+      !formData.standard ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setErrorMessage(
+        "Please fill in all the fields before starting the test."
+      );
     } else {
       try {
-        const response = await axios.post('http://localhost:5000/users/check', formData);
-        const isRegistered = response.data.isRegistered;
+        const response = await axios.post(
+          `http://localhost:5000/users/check`,
+          formData
+        );
 
-        if (isRegistered) {
-          navigate('/test', { state: formData });
+        if (response.status === 200) {
+          console.log(response.data);
+          localJwt(response.data.token);
+          navigate("/test", { state: formData });
         } else {
-          setErrorMessage('You are not a registered user. Please register first.');
+          setErrorMessage(
+            "You are not a registered user. Please register first."
+          );
         }
       } catch (error) {
-        console.error('Error checking registered user:', error);
-        setErrorMessage('An error occurred. Please try again later.');
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.message
+        ) {
+          setErrorMessage(error.response.data.message);
+        } else {
+          setErrorMessage("An error occurred. Please try again later.");
+        }
       }
     }
   };
@@ -54,7 +80,7 @@ function HomePage() {
             src={examPortalImage}
             alt="Exam Portal"
             className="img-fluid mb-4"
-            style={{ maxWidth: '300px' }}
+            style={{ maxWidth: "300px" }}
           />
           <h1 className="card-title">Welcome to the Exam Portal</h1>
           <p className="card-text">Prepare yourself for the upcoming test!</p>
@@ -101,7 +127,7 @@ function HomePage() {
             </div>
             <div className="form-group password-container">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 placeholder="Password"
@@ -109,7 +135,9 @@ function HomePage() {
                 onChange={handleChange}
               />
               <span
-                className={`password-toggle-icon ${showPassword ? 'visible' : ''}`}
+                className={`password-toggle-icon ${
+                  showPassword ? "visible" : ""
+                }`}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 <RiEyeLine />
@@ -119,7 +147,7 @@ function HomePage() {
           <button className="btn btn-primary" onClick={handleStartTest}>
             Start Test
           </button>
-          {errorMessage && <p className='alert-message'>{errorMessage}</p>}
+          {errorMessage && <p className="alert-message">{errorMessage}</p>}
         </div>
       </div>
     </div>

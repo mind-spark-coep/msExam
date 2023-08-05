@@ -7,33 +7,47 @@ const signToken = (id) => {
   });
 };
 exports.registerUser = async (req, res) => {
-  const { name } = req.body;
+  const { email, password } = req.body;
+
   try {
-    const student = await User.findOne({ name });
+    // Check if the user exists based on the email\
+    console.log(email, password);
 
-    if (!student) {
-      return res.status(203).json({ message: "No such student" });
+    let user = await User.findOne({ email });
+
+    // If user exists
+    if (user) {
+      console.log(user);
+
+      // Check the hasGiven parameter
+      if (user.hasGiven) {
+        // If hasGiven is true, throw an error indicating that the exam has already been given
+        return res.status(403).json({ error: "Exam already given" });
+      } else {
+        // If hasGiven is false, proceed with password authentication
+        if (user.password != password) {
+          console.log("password checke");
+          // If the password is incorrect, throw an error indicating invalid credentials
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // Password is correct, set hasGiven to true, and save the user
+        user.hasGiven = true;
+        let token = signToken();
+
+        await user.save();
+        console.log("here");
+
+        // Respond with success message
+        return res
+          .status(200)
+          .json({ message: "User registration completed", token: token });
+      }
+    } else {
+      // If the user does not exist, respond with an error indicating that the user is not registered
+      return res.status(403).json({ error: "User not registered" });
     }
-
-    const cookieOptions = {
-      expires: new Date(
-        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 60 * 1000
-      ),
-      httpOnly: true,
-    };
-
-    if (process.env.NODE_ENV === "production") {
-      cookieOptions.secure = true;
-    }
-
-    // Generate and send a JWT token for authentication
-    const key = signToken(student._id);
-
-    // student.password = null; // Not sure why this line is commented out
-
-    return res.status(200).json({ message: "Login successful", token: key });
-  } catch (err) {
-    console.log(err);
-    return res.status(400).json({ error: "Invalid Credentials" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
