@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
-import mindsparkName from '../assets/mindspark23.png';
-import './TestPage.css';
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import mindsparkName from "../assets/mindspark23.png";
+import "./TestPage.css";
 
 function TestPage() {
   const [questions, setQuestions] = useState([]);
@@ -15,14 +15,23 @@ function TestPage() {
 
   const fetchQuestions = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5000/questions');
+      const jwt = localStorage.getItem("jwt");
+
+      const response = await axios.get("http://localhost:5000/questions", {
+        headers: {
+          Authorization: `${jwt}`, // Set the Authorization header with the JWT value
+        },
+      });
+
       console.log("Connection Established");
       setQuestions(response.data);
-      setUserResponses(Array(response.data.length).fill({ questionId: '', selectedAnswer: '' }));
+      setUserResponses(
+        Array(response.data.length).fill({ questionId: "", selectedAnswer: "" })
+      );
       console.log("All Questions Received");
       console.log(response.data);
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error("Error fetching questions:", error);
     }
   }, []);
 
@@ -62,18 +71,18 @@ function TestPage() {
 
       let totalScore = 0;
 
-      const response = await axios.post('http://localhost:5000/responses', {
+      const response = await axios.post("http://localhost:5000/responses", {
         userID: name,
         responses: responsesWithoutIsCorrect,
         score: totalScore,
         formData: location.state,
       });
 
-      console.log('Responses submitted Successfully');
+      console.log("Responses submitted Successfully");
       console.log(response);
-      navigate('/result', { state: { score: totalScore } });
+      navigate("/result", { state: { score: totalScore } });
     } catch (error) {
-      console.error('Error submitting responses:', error);
+      console.error("Error submitting responses:", error);
     }
   }, [name, userResponses, location.state, navigate]);
 
@@ -112,7 +121,9 @@ function TestPage() {
         {questions.map((_, index) => (
           <button
             key={index}
-            className={`question-number btn btn-light ${currentQuestionIndex === index ? 'active' : ''}`}
+            className={`question-number btn btn-light ${
+              currentQuestionIndex === index ? "active" : ""
+            }`}
             onClick={() => handleQuestionNumberClick(index)}
           >
             {index + 1}
@@ -122,11 +133,12 @@ function TestPage() {
     );
   };
 
-
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -135,7 +147,9 @@ function TestPage() {
         <img className="mindspark-logo" src={mindsparkName} alt="Mindspark23" />
       </div>
       <div className="timer-container">
-        <div className="timer-box">Time Remaining: {formatTime(remainingTime)}</div>
+        <div className="timer-box">
+          Time Remaining: {formatTime(remainingTime)}
+        </div>
       </div>
       {currentQuestion ? (
         <div className="card">
@@ -150,7 +164,12 @@ function TestPage() {
                   onClick={() => handleOptionSelect(option)}
                 >
                   <button
-                    className={`btn btn-transparent ${userResponses[currentQuestionIndex]?.selectedAnswer === option ? 'selected' : ''}`}
+                    className={`btn btn-transparent ${
+                      userResponses[currentQuestionIndex]?.selectedAnswer ===
+                      option
+                        ? "selected"
+                        : ""
+                    }`}
                   >
                     {option}
                   </button>
@@ -167,9 +186,19 @@ function TestPage() {
               </button>
               {renderQuestionNumbersGrid()}
               {currentQuestionIndex === questions.length - 1 ? (
-                <button className="btn btn-success btn-lg navibutton" onClick={submitResponses}>Submit</button>
+                <button
+                  className="btn btn-success btn-lg navibutton"
+                  onClick={submitResponses}
+                >
+                  Submit
+                </button>
               ) : (
-                <button className="btn btn-primary btn-lg navibutton" onClick={handleNextQuestion}>Next</button>
+                <button
+                  className="btn btn-primary btn-lg navibutton"
+                  onClick={handleNextQuestion}
+                >
+                  Next
+                </button>
               )}
             </div>
           </div>
