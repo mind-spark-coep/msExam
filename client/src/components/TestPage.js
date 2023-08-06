@@ -64,6 +64,7 @@ function TestPage() {
 
   const submitResponses = useCallback(async () => {
     try {
+      const jwt = localStorage.getItem("jwt");
       const responsesWithoutIsCorrect = userResponses.map((response) => ({
         questionId: response.questionId,
         selectedAnswer: response.selectedAnswer,
@@ -71,12 +72,20 @@ function TestPage() {
 
       let totalScore = 0;
 
-      const response = await axios.post("http://localhost:5000/responses", {
-        userID: name,
-        responses: responsesWithoutIsCorrect,
-        score: totalScore,
-        formData: location.state,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/responses",
+        {
+          userID: name,
+          responses: responsesWithoutIsCorrect,
+          score: totalScore,
+          formData: location.state,
+        },
+        {
+          headers: {
+            Authorization: `${jwt}`,
+          },
+        }
+      );
 
       console.log("Responses submitted Successfully");
       console.log(response);
@@ -85,6 +94,7 @@ function TestPage() {
       console.error("Error submitting responses:", error);
     }
   }, [name, userResponses, location.state, navigate]);
+
 
   useEffect(() => {
     fetchQuestions();
@@ -121,9 +131,8 @@ function TestPage() {
         {questions.map((_, index) => (
           <button
             key={index}
-            className={`question-number btn btn-light ${
-              currentQuestionIndex === index ? "active" : ""
-            }`}
+            className={`question-number btn btn-light ${currentQuestionIndex === index ? "active" : ""
+              }`}
             onClick={() => handleQuestionNumberClick(index)}
           >
             {index + 1}
@@ -164,12 +173,11 @@ function TestPage() {
                   onClick={() => handleOptionSelect(option)}
                 >
                   <button
-                    className={`btn btn-transparent ${
-                      userResponses[currentQuestionIndex]?.selectedAnswer ===
-                      option
+                    className={`btn btn-transparent ${userResponses[currentQuestionIndex]?.selectedAnswer ===
+                        option
                         ? "selected"
                         : ""
-                    }`}
+                      }`}
                   >
                     {option}
                   </button>
