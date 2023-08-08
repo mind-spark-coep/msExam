@@ -11,12 +11,12 @@ exports.registerUser = async (req, res) => {
 
   try {
     // Does User Exist ?
-    console.log(email, password);
+    // console.log(email, password);
 
     let user = await User.findOne({ email });
 
     if (user) {
-      console.log(user);
+      // console.log(user);
 
       // Check the hasGiven parameter
       if (user.hasGiven) {
