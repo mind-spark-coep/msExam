@@ -8,7 +8,7 @@ function TestPage() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userResponses, setUserResponses] = useState([]);
-  const [remainingTime, setRemainingTime] = useState(60 * 30); // 30 minutes in seconds
+  const [remainingTime, setRemainingTime] = useState(10); //onLoad Submit is prevented
   const location = useLocation();
   const navigate = useNavigate();
   const { name } = location.state; // for ID
@@ -19,7 +19,7 @@ function TestPage() {
 
       const response = await axios.get("http://localhost:5000/questions", {
         headers: {
-          Authorization: `${jwt}`, // Set the Authorization header with the JWT value
+          Authorization: `${jwt}`,
         },
       });
 
@@ -29,7 +29,6 @@ function TestPage() {
         Array(response.data.length).fill({ questionId: "", selectedAnswer: "" })
       );
       console.log("All Questions Received");
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching questions:", error);
     }
@@ -88,7 +87,6 @@ function TestPage() {
       );
 
       console.log("Responses submitted Successfully");
-      console.log(response);
       navigate("/result", { state: { score: totalScore } });
     } catch (error) {
       console.error("Error submitting responses:", error);
@@ -101,14 +99,38 @@ function TestPage() {
   }, [fetchQuestions]);
 
   useEffect(() => {
+    const fetchRemainingTime = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/time/remaining");
+        const { remainingTime } = response.data;
+
+        setRemainingTime(remainingTime);
+      } catch (error) {
+        console.error("Error fetching remaining time:", error);
+      }
+    };
+
+    fetchRemainingTime();
+  }, []);
+
+  useEffect(() => {
     const timer = setInterval(() => {
-      setRemainingTime((prevTime) => prevTime - 1);
+      setRemainingTime((prevTime) => Math.max(prevTime - 1, 0));
     }, 1000);
 
     return () => {
       clearInterval(timer);
     };
   }, []);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
 
   useEffect(() => {
     if (remainingTime === 0) {
@@ -142,13 +164,7 @@ function TestPage() {
     );
   };
 
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
-      .toString()
-      .padStart(2, "0")}`;
-  };
+
 
   return (
     <div className="test-page-container">
@@ -174,9 +190,9 @@ function TestPage() {
                 >
                   <button
                     className={`btn btn-transparent ${userResponses[currentQuestionIndex]?.selectedAnswer ===
-                        option
-                        ? "selected"
-                        : ""
+                      option
+                      ? "selected"
+                      : ""
                       }`}
                   >
                     {option}

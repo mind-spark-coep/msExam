@@ -10,42 +10,37 @@ exports.registerUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if the user exists based on the email\
+    // Does User Exist ?
     console.log(email, password);
 
     let user = await User.findOne({ email });
 
-    // If user exists
     if (user) {
       console.log(user);
 
       // Check the hasGiven parameter
       if (user.hasGiven) {
-        // If hasGiven is true, throw an error indicating that the exam has already been given
-        return res.status(403).json({ error: "Exam already given" });
+        // Exam Already Given
+        return res.status(403).json({ message: "Exam already given" });
       } else {
-        // If hasGiven is false, proceed with password authentication
+        // Invalid Password
         if (user.password != password) {
-          console.log("password checke");
-          // If the password is incorrect, throw an error indicating invalid credentials
-          return res.status(401).json({ error: "Invalid credentials" });
+          return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        // Password is correct, set hasGiven to true, and save the user
+        // User Registration Complete
         user.hasGiven = true;
         let token = signToken();
 
         await user.save();
-        console.log("here");
 
-        // Respond with success message
         return res
           .status(200)
           .json({ message: "User registration completed", token: token });
       }
     } else {
-      // If the user does not exist, respond with an error indicating that the user is not registered
-      return res.status(403).json({ error: "User not registered" });
+      // User Doesn't Exist
+      return res.status(403).json({ message: "User not registered" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

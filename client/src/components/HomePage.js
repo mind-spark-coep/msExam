@@ -31,7 +31,7 @@ function HomePage() {
 
   const handleStartTest = async () => {
     console.log(formData);
-    // console.log(`${process.env.SERVER_URL}users/check`);
+
     if (
       !formData.name ||
       !formData.school ||
@@ -54,9 +54,7 @@ function HomePage() {
           localJwt(response.data.token);
           navigate("/test", { state: formData });
         } else {
-          setErrorMessage(
-            "You are not a registered user. Please register first."
-          );
+          setErrorMessage(response.data.message);
         }
       } catch (error) {
         if (
