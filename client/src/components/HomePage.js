@@ -17,6 +17,7 @@ function HomePage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,7 +46,7 @@ function HomePage() {
     } else {
       try {
         const response = await axios.post(
-          `http://localhost:5000/users/check`,
+          `${serverUrl}/users/check`,
           formData
         );
 

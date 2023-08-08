@@ -12,12 +12,13 @@ function TestPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { name } = location.state; // for ID
+  const serverUrl = process.env.REACT_APP_SERVER_URL;
 
   const fetchQuestions = useCallback(async () => {
     try {
       const jwt = localStorage.getItem("jwt");
 
-      const response = await axios.get("http://localhost:5000/questions", {
+      const response = await axios.get(`${serverUrl}/questions`, {
         headers: {
           Authorization: `${jwt}`,
         },
@@ -72,7 +73,7 @@ function TestPage() {
       let totalScore = 0;
 
       const response = await axios.post(
-        "http://localhost:5000/responses",
+        `${serverUrl}/responses`,
         {
           userID: name,
           responses: responsesWithoutIsCorrect,
@@ -101,7 +102,13 @@ function TestPage() {
   useEffect(() => {
     const fetchRemainingTime = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/time/remaining");
+        const jwt = localStorage.getItem("jwt");
+
+        const response = await axios.get(`${serverUrl}/time/remaining`, {
+          headers: {
+            Authorization: ` ${jwt}`,
+          },
+        });
         const { remainingTime } = response.data;
 
         setRemainingTime(remainingTime);
